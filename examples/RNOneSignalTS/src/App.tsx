@@ -20,12 +20,9 @@ import {
 
 import {
   Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
+  Colors
 } from 'react-native/Libraries/NewAppScreen';
-import OneSignalDemo from './OneSignal';
+import OneSignalDemo from './OneSignalDemo';
 
 declare const global: {HermesInternal: null | {}};
 
