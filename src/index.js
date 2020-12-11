@@ -209,7 +209,7 @@ export default class OneSignal {
 
     /* N O T I F I C A T I O N S */
 
-    static postNotification(notificationObjectString, onSuccess, onFailure) {
+    static postNotification(notificationObjectString, onSuccess=()=>{}, onFailure=()=>{}) {
         if (!checkIfInitialized(RNOneSignal)) return;
         RNOneSignal.postNotification(notificationObjectString, onSuccess, onFailure);
     }
@@ -224,13 +224,13 @@ export default class OneSignal {
         }
     }
 
-    static cancelNotification(id) {
+    static removeNotification(id) {
         if (!checkIfInitialized(RNOneSignal)) return;
 
         if (Platform.OS === 'android') {
-            RNOneSignal.cancelNotification(id);
+            RNOneSignal.removeNotification(id);
         } else {
-            console.log("cancelNotification: this function is not supported on iOS");
+            console.log("removeNotification: this function is not supported on iOS");
         }
     }
 

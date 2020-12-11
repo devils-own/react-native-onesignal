@@ -56,7 +56,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import com.onesignal.OSEmailSubscriptionStateChanges;
 import com.onesignal.OneSignal;
-import com.onesignal.OutcomeEvent;
+import com.onesignal.OSOutcomeEvent;
 import com.onesignal.OSDeviceState;
 import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OSNotification;
@@ -354,8 +354,8 @@ public class RNOneSignal extends ReactContextBaseJavaModule
    }
 
    @ReactMethod
-   public void cancelNotification(int id) {
-      OneSignal.cancelNotification(id);
+   public void removeNotification(int id) {
+      OneSignal.removeNotification(id);
    }
 
    @ReactMethod
@@ -377,10 +377,17 @@ public class RNOneSignal extends ReactContextBaseJavaModule
    public void setExternalUserId(final String externalId, final Callback callback) {
       OneSignal.setExternalUserId(externalId, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
          @Override
-         public void onComplete(JSONObject results) {
+         public void onSuccess(JSONObject results) {
             Log.i("OneSignal", "Completed setting external user id: " + externalId + "with results: " + results.toString());
+
             if (callback != null)
                callback.invoke(RNUtils.jsonToWritableMap(results));
+         }
+
+         @Override
+         public void onFailure(OneSignal.ExternalIdError error) {
+            if (callback != null)
+               callback.invoke(error.getMessage());
          }
       });
    }
@@ -389,10 +396,17 @@ public class RNOneSignal extends ReactContextBaseJavaModule
    public void removeExternalUserId(final Callback callback) {
       OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
          @Override
-         public void onComplete(JSONObject results) {
+         public void onSuccess(JSONObject results) {
             Log.i("OneSignal", "Completed removing external user id with results: " + results.toString());
+
             if (callback != null)
                callback.invoke(RNUtils.jsonToWritableMap(results));
+         }
+
+         @Override
+         public void onFailure(OneSignal.ExternalIdError error) {
+            if (callback != null)
+               callback.invoke(error.getMessage());
          }
       });
    }
@@ -521,7 +535,7 @@ public class RNOneSignal extends ReactContextBaseJavaModule
    public void sendOutcome(final String name, final Callback callback) {
       OneSignal.sendOutcome(name, new OutcomeCallback() {
          @Override
-         public void onSuccess(OutcomeEvent outcomeEvent) {
+         public void onSuccess(OSOutcomeEvent outcomeEvent) {
             if (outcomeEvent == null)
                callback.invoke(new WritableNativeMap());
             else {
@@ -539,7 +553,7 @@ public class RNOneSignal extends ReactContextBaseJavaModule
    public void sendUniqueOutcome(final String name, final Callback callback) {
       OneSignal.sendUniqueOutcome(name, new OutcomeCallback() {
          @Override
-         public void onSuccess(OutcomeEvent outcomeEvent) {
+         public void onSuccess(OSOutcomeEvent outcomeEvent) {
             if (outcomeEvent == null)
                callback.invoke(new WritableNativeMap());
             else {
@@ -557,7 +571,7 @@ public class RNOneSignal extends ReactContextBaseJavaModule
    public void sendOutcomeWithValue(final String name, final float value, final Callback callback) {
       OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback() {
          @Override
-         public void onSuccess(OutcomeEvent outcomeEvent) {
+         public void onSuccess(OSOutcomeEvent outcomeEvent) {
             if (outcomeEvent == null)
                callback.invoke(new WritableNativeMap());
             else {

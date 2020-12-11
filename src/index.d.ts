@@ -23,8 +23,8 @@ declare module 'react-native-onesignal' {
     };
 
     export interface SubscriptionChange {
-        userId                  : string;
-        pushToken               : string;
+        userId                  ?: string;
+        pushToken               ?: string;
         isSubscribed            : boolean;
         isPushDisabled          : boolean;
     };
@@ -38,42 +38,42 @@ declare module 'react-native-onesignal' {
     /* N O T I F I C A T I O N S */
     export interface OSNotification {
         body            : string;
-        sound           : string;
-        title           : string;
-        launchURL       : string;
-        rawPayload      : object | string;
-        actionButtons   : object[];
+        sound           ?: string;
+        title           ?: string;
+        launchURL       ?: string;
+        rawPayload      : object | string; // platform bridges return different types
+        actionButtons   ?: object[];
         additionalData  : object;
         notificationId  : string;
         // android only
         groupKey                ?: string;
+        groupMessage            ?: string;
         ledColor                ?: string;
         priority                ?: number;
         smallIcon               ?: string;
         largeIcon               ?: string;
         bigPicture              ?: string;
         collapseId              ?: string;
-        groupMessage            ?: string;
         fromProjectNumber       ?: string;
         smallIconAccentColor    ?: string;
         lockScreenVisibility    ?: string;
         androidNotificationId   ?: number;
         // ios only
         badge               ?: string;
+        badgeIncrement      ?: string;
         category            ?: string;
         threadId            ?: string;
         subtitle            ?: string;
         templateId          ?: string;
-        attachments         ?: object;
         templateName        ?: string;
+        attachments         ?: object;
         mutableContent      ?: boolean;
-        badgeIncrement      ?: string;
         contentAvailable    ?: string;
     }
 
     /* N O T I F I C A T I O N   &   I A M   E V E N T S */
     export interface NotificationReceivedEvent {
-        complete        : (notification: OSNotification) => void;
+        complete        : (notification?: OSNotification) => void;
         getNotification : () => OSNotification;
     };
 
@@ -166,7 +166,7 @@ declare module 'react-native-onesignal' {
          * @param  {(response:boolean)=>void} handler
          * @returns void
          */
-        promptForPushNotificationsWithUserResponse(handler: (response: boolean) => void): void;
+        promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void;
 
         /**
          * Disable the push notification subscription to OneSignal.
@@ -242,13 +242,13 @@ declare module 'react-native-onesignal' {
          * @param  {Function} handler
          * @returns void
          */
-        setEmail(email: string, authCode: string, handler: Function): void;
+        setEmail(email: string, authCode?: string, handler?: Function): void;
 
         /**
          * If your app implements logout functionality, you can call logoutEmail to dissociate the email from the device.
          * @param  {Function} handler
          */
-        logoutEmail(handler: Function);
+        logoutEmail(handler?: Function);
 
         /**
          * Send a notification
@@ -260,16 +260,17 @@ declare module 'react-native-onesignal' {
         postNotification(notificationObjectString: string, onSuccess: (success: object) => void, onFailure: (failure: object) => void): void;
 
         /**
-         * iOS provides a standard way to clear notifications by clearing badge count.
+         * Android Only. iOS provides a standard way to clear notifications by clearing badge count.
          * @returns void
          */
         clearOneSignalNotifications(): void;
 
         /**
          * Cancels a single OneSignal notification based on its Android notification integer id.
+         * @param  {number} id - notification id to cancel
          * @returns void
          */
-        cancelNotification(): void;
+        cancelNotification(id: number): void;
 
         /**
          * Allows you to use your own system's user ID's to send push notifications to your users.
@@ -277,14 +278,14 @@ declare module 'react-native-onesignal' {
          * @param  {(results:object)=>void} handler
          * @returns void
          */
-        setExternalUserId(externalId: string, handler: (results: object) => void): void;
+        setExternalUserId(externalId: string, handler?: (results: object) => void): void;
 
         /**
          * Removes whatever was set as the current user's external user ID.
          * @param  {(results:object)=>void} handler
          * @returns void
          */
-        removeExternalUserId(handler: (results: object) => void): void;
+        removeExternalUserId(handler?: (results: object) => void): void;
 
         /**
          * Sets an In-App Message click event handler.
