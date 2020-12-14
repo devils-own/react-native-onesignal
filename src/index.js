@@ -136,7 +136,7 @@ export default class OneSignal {
     static sendTag(key, value) {
         if (!checkIfInitialized(RNOneSignal)) return;
 
-        if (!key || !value) {
+        if (!key || (!value && value !== "")) {
             console.error("OneSignal: sendTag: must include a key and a value");
         }
 
@@ -203,14 +203,24 @@ export default class OneSignal {
 
     static logoutEmail(handler) {
         if (!checkIfInitialized(RNOneSignal)) return;
-        isValidCallback(handler);
+
+        if (!handler)
+            handler = function(){};
+
         RNOneSignal.logoutEmail(handler);
     }
 
     /* N O T I F I C A T I O N S */
 
-    static postNotification(notificationObjectString, onSuccess=()=>{}, onFailure=()=>{}) {
+    static postNotification(notificationObjectString, onSuccess, onFailure) {
         if (!checkIfInitialized(RNOneSignal)) return;
+
+        if (!onSuccess)
+            onSuccess = function(){};
+
+        if (!onFailure)
+            onFailure = function(){};
+
         RNOneSignal.postNotification(notificationObjectString, onSuccess, onFailure);
     }
 
@@ -236,13 +246,15 @@ export default class OneSignal {
 
     /* E X T E R N A L  U S E R  I D */
 
-    static setExternalUserId(externalId, handler) {
+    static setExternalUserId(externalId, varArg1, varArg2) {
         if (!checkIfInitialized(RNOneSignal)) return;
 
-        if (handler === undefined)
-            handler = function(){};
+        if (typeof varArg1 === "function") {
+            RNOneSignal.setExternalUserId(externalId, null, varArg1);
+            return;
+        }
 
-        RNOneSignal.setExternalUserId(externalId, handler);
+        RNOneSignal.setExternalUserId(externalId, varArg1, varArg2 || function(){});
     }
 
     static removeExternalUserId(handler) {
