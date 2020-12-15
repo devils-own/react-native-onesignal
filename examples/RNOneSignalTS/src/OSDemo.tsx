@@ -1,9 +1,10 @@
 import OneSignal from 'react-native-onesignal';
 import * as React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Alert} from 'react-native';
 import OSButtons from './OSButtons';
 import { SubscribeFields } from './models/SubscribeFields';
 import OSConsole from './OSConsole';
+import { renderButtonView } from './Helpers';
 
 export interface Props {
   name: string;
@@ -15,6 +16,7 @@ export interface State {
     isLocationShared: boolean;
     requiresPrivacyConsent: boolean;
     consoleValue: string;
+    inputValue: string;
 }
 
 class OSDemo extends React.Component<Props, State> {
@@ -26,6 +28,7 @@ class OSDemo extends React.Component<Props, State> {
             isSubscribed: false,
             requiresPrivacyConsent: false,
             isLocationShared: false,
+            inputValue: "",
             consoleValue: ""
         }
     }
@@ -44,7 +47,18 @@ class OSDemo extends React.Component<Props, State> {
         OneSignal.setNotificationWillShowInForegroundHandler(notifReceivedEvent => {
             this.OSLog("OneSignal: notification will show in foreground:", notifReceivedEvent);
             let notif = notifReceivedEvent.getNotification();
-            setTimeout(()=>notifReceivedEvent.complete(notif), 0);
+            notifReceivedEvent.complete(notif);
+            return;
+
+            const button1 = {
+                text: "Cancel",
+                onPress: () => { notifReceivedEvent.complete(); },
+                style: "cancel"
+            };
+
+            const button2 = { text: "Complete", onPress: () => { notifReceivedEvent.complete(notif); }};
+
+            Alert.alert("Complete notification?", "Test", [ button1, button2], { cancelable: true });
         });
         OneSignal.setNotificationOpenedHandler(notification => {
             this.OSLog("OneSignal: notification opened:", notification);
@@ -70,10 +84,14 @@ class OSDemo extends React.Component<Props, State> {
         });
     }
 
-    OSLog = (message: string, optionalArg: Object) => {
+    OSLog = (message: string, optionalArg?: Object) => {
+
         if (optionalArg) {
             message = message + JSON.stringify(optionalArg);
         }
+
+        console.log(message);
+
         let consoleValue;
 
         if (this.state.consoleValue) {
@@ -84,16 +102,22 @@ class OSDemo extends React.Component<Props, State> {
         this.setState({ consoleValue });
     }
 
+    inputChange = (text: string) => {
+        this.setState({ inputValue: text })
+    }
+
     render() {
         const subscribeFields : SubscribeFields = {
-            isSubscribed        : this.state.isSubscribed,
+            isSubscribed : this.state.isSubscribed,
         }
 
         return (
             <View style={styles.root}>
                 <Text style={styles.title} >OneSignal</Text>
+                {renderButtonView("Clear", 'gray', () => { this.setState({ consoleValue: "" }) })}
                 <OSConsole value={this.state.consoleValue}/>
-                <OSButtons subscribeFields={subscribeFields} loggingFunction={this.OSLog} />
+                <TextInput style={styles.input} placeholder="Input" onChangeText={this.inputChange}/>
+                <OSButtons subscribeFields={subscribeFields} loggingFunction={this.OSLog} inputFieldValue={this.state.inputValue}/>
             </View>
         );
     }
@@ -126,9 +150,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 0
   },
-  greeting: {
-    color: '#999',
-    fontWeight: 'bold'
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 2,
+    borderRadius: 5,
+    width: 300,
+    margin: 10
   }
 });
 
