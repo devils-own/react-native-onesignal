@@ -85,27 +85,7 @@ class OSButtons extends React.Component<Props, State> {
             }
         );
 
-        let email = ""; // TO DO: from user input
-        const setEmailButton = renderButtonView(
-            "Set Email",
-            color,
-            () => {
-                loggingFunction("Setting email...");
-                let authCode; // SET AUTH CODE HERE
-                OneSignal.setEmail(email, authCode);
-            }
-        );
-
-        const logoutEmailButton = renderButtonView(
-            "Logout Email",
-            color,
-            () => {
-                loggingFunction("Logging out of email...");
-                OneSignal.logoutEmail();
-            }
-        );
-
-        elements.push(subscribedButton, setLocationShared, promptLocationButton, setEmailButton, logoutEmailButton);
+        elements.push(subscribedButton, setLocationShared, promptLocationButton);
 
         if (Platform.OS === 'ios') {
             elements.push(promptForPush);
@@ -222,9 +202,12 @@ class OSButtons extends React.Component<Props, State> {
             sendTagWithKey,
             getTags,
             deleteTagWithKey,
-            clearOneSignalNotificationsButton,
             removeNotificationButton
         );
+
+        if (Platform.OS === "android") {
+            elements.push(clearOneSignalNotificationsButton);
+        }
 
         return elements;
     }
@@ -263,7 +246,7 @@ class OSButtons extends React.Component<Props, State> {
             color,
             () => {
                 loggingFunction("Attempting to set external id: ", this.props.inputFieldValue);
-                OneSignal.setExternalUserId(this.props.inputFieldValue, (res: object) => {
+                OneSignal.setExternalUserId(this.props.inputFieldValue, "aaa", (res: object) => {
                     loggingFunction("setExternalUserId completed with result: ", JSON.stringify(res));
                 })
             }
